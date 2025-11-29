@@ -1,0 +1,21 @@
+================================================================================
+UK ROAD SAFETY DATA ANALYSIS - EXECUTIVE SUMMARY
+================================================================================
+
+PROJECT TITLE:
+Analysis of Risk Factors in Traffic Accidents in Great Britain (2024)
+
+RESEARCH QUESTION:
+What factors are most correlated with severe accidents?
+
+================================================================================
+DATASET INFORMATION
+================================================================================
+Source: UK Department for Transport
+URL: https://www.gov.uk/government/statistical-data-sets/road-safety-open-data
+License: Open Government Licence
+Original Records: 100,927 collisions
+Final Cleaned Records: 26,516 collisions
+Features: 19 selected from 44 available
+Period: 2024
+Coverage: Great Britain
