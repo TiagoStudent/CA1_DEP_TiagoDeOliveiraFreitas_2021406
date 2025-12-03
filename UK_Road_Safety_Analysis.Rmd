@@ -14,3 +14,55 @@ output:
     code_folding: show
     df_print: paged
 ---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
+                      fig.width = 10, fig.height = 6, dpi = 150)
+```
+# 1. Introduction and Project Goal {.tabset}
+
+## 1.1. Context
+
+This project conducts a comprehensive exploratory analysis of road traffic accident data in the United Kingdom for the year 2024, utilizing public data from the **UK Department for Transport**.
+
+## 1.2. Research Question
+
+> **What factors are most correlated with severe traffic accidents?**
+
+This question is fundamental for:
+
+- Identifying key risk factors
+- Informing public road safety policies
+- Reducing serious accidents and fatalities
+
+## 1.3. Methodology
+
+The project follows these steps:
+
+1.  **Initial Exploration**: Load and understand the data structure.
+2.  **Cleaning and Preparation**: Handle missing values and create new features.
+3.  **Exploratory Data Analysis (EDA)**: Visualize relationships and patterns.
+4.  **Encoding and PCA**: Prepare data for modeling and reduce dimensionality.
+5.  **Conclusion**: Present findings and their implications.
+
+---
+
+# 2. Loading Libraries and Data
+
+## 2.1. Installing and Loading Packages
+
+```{r libraries}
+# Install and load necessary packages
+required_packages <- c("tidyverse", "ggplot2", "corrplot", "psych", 
+                       "gridExtra", "scales", "RColorBrewer", 
+                       "FactoMineR", "factoextra", "knitr", "kableExtra")
+
+for(pkg in required_packages) {
+  if(!require(pkg, character.only = TRUE, quietly = TRUE)) {
+    install.packages(pkg, repos = "https://cloud.r-project.org/", quiet = TRUE)
+    library(pkg, character.only = TRUE)
+  }
+}
+
+cat("All packages loaded successfully!\n")
+```
