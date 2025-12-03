@@ -1,0 +1,16 @@
+---
+title: "UK Road Traffic Accident Analysis (2024)"
+subtitle: "Exploration, Preparation, and Risk Factor Analysis"
+author: "Tiago De Oliveira Freitas - 2021406"
+date: "November 30, 2025"
+output: 
+  html_document
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    number_sections: true
+    theme: cosmo
+    highlight: tango
+    code_folding: show
+    df_print: paged
+---
