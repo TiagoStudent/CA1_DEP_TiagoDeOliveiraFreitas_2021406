@@ -1,4 +1,4 @@
----
+
 title: "UK Road Traffic Accident Analysis (2024)"
 subtitle: "Exploration, Preparation, and Risk Factor Analysis"
 author: "Tiago De Oliveira Freitas - 2021406"
@@ -13,7 +13,6 @@ output:
     highlight: tango
     code_folding: show
     df_print: paged
----
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE, 
@@ -27,7 +26,7 @@ This project conducts a comprehensive exploratory analysis of road traffic accid
 
 ## 1.2. Research Question
 
-> **What factors are most correlated with severe traffic accidents?**
+**What factors are most correlated with severe traffic accidents?**
 
 This question is fundamental for:
 
@@ -65,4 +64,71 @@ for(pkg in required_packages) {
 }
 
 cat("All packages loaded successfully!\n")
+```
+
+## 2.5. Descriptive Statistics
+
+```{r summary_stats}
+# Statistical summary
+summary(df) %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover"))
+```
+
+# 3. Severity Distribution Analysis
+
+## 3.1. Severity Classification
+
+Accidents are classified into three levels:
+
+-   **Fatal (1)**: Accidents resulting in deaths.
+-   **Serious (2)**: Accidents with serious injuries.
+-   **Slight (3)**: Accidents with minor injuries.
+
+```{r severity_distribution}
+# Create severity labels
+df$severity_label <- factor(df$collision_severity, 
+                             levels = c(1, 2, 3),
+                             labels = c("Fatal", "Serious", "Slight"))
+
+# Calculate distribution
+severity_dist <- table(df$severity_label)
+severity_pct <- prop.table(severity_dist) * 100
+
+# Display table
+severity_table <- data.frame(
+  Severity = names(severity_dist),
+  Count = as.numeric(severity_dist),
+  Percentage = sprintf("%.2f%%", severity_pct)
+)
+
+severity_table %>%
+  kable(col.names = c("Severity", "Count", "Percentage (%)")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 3.2. Distribution Visualization
+
+```{r severity_plot, fig.cap="Accident Severity Distribution"}
+severity_df <- data.frame(
+  severity = names(severity_dist),
+  count = as.numeric(severity_dist),
+  pct = as.numeric(severity_pct)
+)
+
+ggplot(severity_df, aes(x=severity, y=count, fill=severity)) +
+  geom_bar(stat="identity", color="black", size=1) +
+  scale_fill_manual(values=c("Fatal"="#d62728", "Serious"="#ff7f0e", "Slight"="#2ca02c")) +
+  geom_text(aes(label=sprintf("%s\n(%.1f%%)", 
+                              format(count, big.mark=","), pct)),
+            vjust=-0.5, size=4, fontface="bold") +
+  labs(title="Accident Severity Distribution",
+       x="Severity Level",
+       y="Number of Accidents") +
+  theme_minimal() +
+  theme(plot.title = element_text(size=16, face="bold", hjust=0.5),
+        axis.title = element_text(size=12),
+        axis.text = element_text(size=11),
+        legend.position = "none") +
+  scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.1)))
 ```
