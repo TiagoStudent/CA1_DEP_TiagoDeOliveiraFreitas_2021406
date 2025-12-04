@@ -132,3 +132,71 @@ ggplot(severity_df, aes(x=severity, y=count, fill=severity)) +
         legend.position = "none") +
   scale_y_continuous(labels = scales::comma, expand = expansion(mult = c(0, 0.1)))
 ```
+
+**Observation**: The majority of accidents (81.14%) are classified as slight, while fatal accidents represent only 0.66% of the total.
+
+
+# 4. Correlation Analysis
+
+## 4.1. Correlation Matrix
+
+```{r correlation_matrix}
+# Select numerical columns
+numerical_cols <- c("collision_severity", "number_of_vehicles", "number_of_casualties",
+                    "speed_limit", "urban_or_rural_area", "is_severe", "light_conditions",
+                    "weather_conditions", "road_surface_conditions")
+
+# Calculate correlation matrix
+corr_data <- df[, numerical_cols]
+corr_matrix <- cor(corr_data, use="complete.obs")
+
+# Visualize
+corrplot(corr_matrix, method="color", type="upper", 
+         addCoef.col="black", number.cex=0.7,
+         tl.col="black", tl.srt=45, tl.cex=0.9,
+         col=colorRampPalette(c("#2ca02c", "white", "#d62728"))(200),
+         title="Correlation Matrix",
+         mar=c(0,0,2,0))
+```
+
+## 4.2. Top 10 Correlations with Severe Accidents
+
+```{r top_correlations}
+# Extract correlations with is_severe
+severity_corr <- corr_matrix[, "is_severe"]
+severity_corr <- sort(severity_corr[names(severity_corr) != "is_severe"], decreasing=TRUE)
+
+# Display table
+top_corr_table <- data.frame(
+  Feature = names(head(severity_corr, 10)),
+  Correlation = sprintf("%.4f", head(severity_corr, 10))
+)
+
+top_corr_table %>%
+  kable(col.names = c("Variable", "Correlation Coefficient")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 4.3. Correlation Visualization
+
+```{r correlation_plot, fig.cap="Top 10 Features Correlated with Severe Accidents"}
+top_corr_df <- data.frame(
+  feature = names(head(severity_corr, 10)),
+  correlation = as.numeric(head(severity_corr, 10))
+)
+top_corr_df$feature <- factor(top_corr_df$feature, 
+                               levels=top_corr_df$feature[order(top_corr_df$correlation)])
+
+ggplot(top_corr_df, aes(x=correlation, y=feature, fill=correlation>0)) +
+  geom_bar(stat="identity", color="black") +
+  scale_fill_manual(values=c("TRUE"="#d62728", "FALSE"="#2ca02c")) +
+  geom_vline(xintercept=0, color="black", size=0.8) +
+  labs(title="Top 10 Features Correlated with Severe Accidents",
+       x="Correlation Coefficient",
+       y="Variable") +
+  theme_minimal() +
+  theme(plot.title = element_text(size=16, face="bold", hjust=0.5),
+        axis.title = element_text(size=12),
+        axis.text = element_text(size=11),
+        legend.position = "none")
+```
