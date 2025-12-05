@@ -1,8 +1,12 @@
 
-title: "UK Road Traffic Accident Analysis (2024)"
-subtitle: "Exploration, Preparation, and Risk Factor Analysis"
-author: "Tiago De Oliveira Freitas - 2021406"
-date: "November 30, 2025"
+## title: 
+  "UK Road Traffic Accident Analysis (2024)"
+## subtitle: 
+  "Exploration, Preparation, and Risk Factor Analysis"
+## author: 
+  "Tiago De Oliveira Freitas - 2021406"
+## date: 
+  "November 30, 2025"
 output: 
   html_document
     toc: true
@@ -199,4 +203,140 @@ ggplot(top_corr_df, aes(x=correlation, y=feature, fill=correlation>0)) +
         axis.title = element_text(size=12),
         axis.text = element_text(size=11),
         legend.position = "none")
+```
+
+**Interpretation**:
+
+-   **Positive Correlations**: Rural areas (+0.047) and high speed limits (+0.041) increase severity.
+-   **Negative Correlations**: Road surface conditions (-0.055) and weather conditions (-0.041) have an inverse relationship.
+
+
+# 5. Bivariate Analysis: Urban vs. Rural
+
+## 5.1. Comparison of Severe Accident Rates
+
+```{r urban_rural_analysis}
+# Create labels
+df$area_label <- factor(df$urban_or_rural_area,
+                        levels = c(1, 2),
+                        labels = c("Urban", "Rural"))
+
+# Calculate rates
+urban_rural_table <- table(df$area_label, df$is_severe)
+urban_rural_pct <- prop.table(urban_rural_table, margin=1) * 100
+
+# Display table
+urban_rural_df_table <- data.frame(
+  Area = rownames(urban_rural_pct),
+  Slight = sprintf("%.2f%%", urban_rural_pct[, 1]),
+  Severe = sprintf("%.2f%%", urban_rural_pct[, 2])
+)
+
+urban_rural_df_table %>%
+  kable(col.names = c("Area Type", "Slight Accidents (%)", "Severe Accidents (%)")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 5.2. Urban vs. Rural Visualization
+
+```{r urban_rural_plot, fig.cap="Severe Accident Rate: Urban vs. Rural"}
+urban_rural_df <- as.data.frame(urban_rural_pct)
+colnames(urban_rural_df) <- c("area", "severity", "percentage")
+urban_rural_df$severity <- factor(urban_rural_df$severity,
+                                  levels = c(0, 1),
+                                  labels = c("Slight", "Severe"))
+
+ggplot(urban_rural_df, aes(x=area, y=percentage, fill=severity)) +
+  geom_bar(stat="identity", position="dodge", color="black") +
+  scale_fill_manual(values=c("Slight"="#2ca02c", "Severe"="#d62728")) +
+  labs(title="Severe Accident Rate: Urban vs. Rural",
+       x="Area Type",
+       y="Percentage (%)",
+       fill="Severity") +
+  theme_minimal() +
+  theme(plot.title = element_text(size=16, face="bold", hjust=0.5),
+        axis.title = element_text(size=12),
+        axis.text = element_text(size=11),
+        legend.position = "top")
+```
+
+**Key Finding**: Rural areas have a **23.67%** rate of severe accidents, while urban areas have a **17.43%** rate.
+
+# 6. Principal Component Analysis (PCA)
+
+## 6.1. Data Preparation
+
+```{r pca_preparation}
+# Select features for PCA
+pca_features <- c("number_of_vehicles", "number_of_casualties", "speed_limit",
+                  "urban_or_rural_area", "light_conditions", "weather_conditions",
+                  "road_surface_conditions", "junction_detail", "junction_control")
+
+# Prepare data
+pca_data <- df[complete.cases(df[, pca_features]), pca_features]
+
+cat(sprintf("Data for PCA: %s rows × %s columns\n", 
+            format(nrow(pca_data), big.mark=","), ncol(pca_data)))
+
+# Standardize
+pca_scaled <- scale(pca_data)
+cat(sprintf("Mean after standardization: %.6f\n", mean(pca_scaled)))
+cat(sprintf("Standard deviation after standardization: %.6f\n", sd(pca_scaled)))
+```
+
+## 6.2. Applying PCA
+
+```{r pca_application}
+# Apply PCA
+pca_result <- prcomp(pca_scaled, center=FALSE, scale.=FALSE)
+
+# Calculate explained variance
+explained_var <- (pca_result$sdev^2) / sum(pca_result$sdev^2)
+cumulative_var <- cumsum(explained_var)
+
+# Create table
+pca_table <- data.frame(
+  Component = paste0("PC", 1:length(explained_var)),
+  Individual_Variance = sprintf("%.2f%%", explained_var*100),
+  Cumulative_Variance = sprintf("%.2f%%", cumulative_var*100)
+)
+
+pca_table %>%
+  kable(col.names = c("Component", "Individual Variance", "Cumulative Variance")) %>%
+  kable_styling(bootstrap_options = c("striped", "hover"), full_width = FALSE)
+```
+
+## 6.3. Required Components
+
+```{r pca_components}
+n_components_90 <- which(cumulative_var >= 0.90)[1]
+cat(sprintf("Components needed for 90%% variance: %d\n", n_components_90))
+cat(sprintf("Dimensionality reduction: %.2f%%\n", 
+            (1 - n_components_90/length(pca_features))*100))
+```
+
+## 6.4. Explained Variance Visualization
+
+```{r pca_variance_plot, fig.width=14, fig.height=6, fig.cap="PCA Explained Variance"}
+par(mfrow=c(1,2))
+
+# Scree plot
+plot(1:length(explained_var), explained_var*100, 
+     type="b", pch=19, col="blue", lwd=2,
+     main="Scree Plot - Variance Explained by Component",
+     xlab="Principal Component",
+     ylab="Explained Variance (%)",
+     cex.main=1.2, cex.lab=1.1)
+grid()
+
+# Cumulative variance
+plot(1:length(cumulative_var), cumulative_var*100, 
+     type="b", pch=19, col="red", lwd=2,
+     main="Cumulative Explained Variance",
+     xlab="Number of Components",
+     ylab="Cumulative Explained Variance (%)",
+     cex.main=1.2, cex.lab=1.1)
+abline(h=90, col="blue", lty=2, lwd=2)
+text(length(cumulative_var)*0.7, 92, "90% variance", col="blue")
+grid()
 ```
