@@ -340,3 +340,85 @@ abline(h=90, col="blue", lty=2, lwd=2)
 text(length(cumulative_var)*0.7, 92, "90% variance", col="blue")
 grid()
 ```
+# Cumulative variance
+
+plot(1:length(cumulative_var), cumulative_var*100, 
+     type="b", pch=19, col="red", lwd=2,
+     main="Cumulative Explained Variance",
+     xlab="Number of Components",
+     ylab="Cumulative Explained Variance (%)",
+     cex.main=1.2, cex.lab=1.1)
+abline(h=90, col="blue", lty=2, lwd=2)
+text(length(cumulative_var)*0.7, 92, "90% variance", col="blue")
+grid()
+```
+
+
+# 7. Conclusion
+
+## 7.1. Key Findings
+
+This project identified the following risk factors for severe accidents:
+
+1.  **Rural Areas** (+4.7% correlation)
+    -   Accidents in rural areas have a 23.67% chance of being severe.
+    -   Urban areas: only 17.43%.
+
+2.  **High Speed Limits** (+4.1% correlation)
+    -   Higher speeds significantly increase severity.
+
+3.  **Poor Lighting Conditions** (+2.6% correlation)
+    -   Darkness and poor lighting are risk factors.
+
+4.  **Junction Type** (+3.3% correlation)
+    -   Certain junction types pose a higher risk.
+
+## 7.2. PCA Results
+
+-   **Dimensionality reduction**: 9 → 7 components
+-   **Variance retained**: 91.76%
+-   **Information loss**: Only 8.24%
+
+## 7.3. Public Policy Implications
+
+Based on the findings, it is recommended to:
+
+-   **Prioritize speed enforcement** in rural areas.
+-   **Invest in road lighting** infrastructure.
+-   **Redesign high-risk junctions**.
+-   **Targeted educational campaigns** for rural drivers.
+-   **Reinforce signage** in identified high-risk areas.
+
+## 7.4. Study Limitations
+
+-   Data limited to the year 2024.
+-   UK-specific (not globally generalizable).
+-   Behavioral variables not included (e.g., alcohol use, distraction).
+
+## 7.5. Future Research
+
+-   Temporal analysis (multiple years).
+-   Predictive modeling of severity.
+-   Integration with real-time traffic data.
+-   Cost-benefit analysis of interventions.
+
+
+# 8. References
+
+1.  UK Department for Transport. (2024). *Road Safety Data*. Available at: https://www.data.gov.uk/
+2.  R Core Team. (2024). *R: A Language and Environment for Statistical Computing*. R Foundation for Statistical Computing.
+3.  Wickham, H. et al. (2019). *Welcome to the Tidyverse*. Journal of Open Source Software, 4(43), 1686.
+
+
+# 9. System Information
+
+```{r session_info}
+sessionInfo()
+```
+
+
+**Author**: Tiago De Oliveira Freitas  
+**Student Number**: 2021406  
+**Institution**: CCT College Dublin  
+**GitHub Repository**: https://github.com/TiagoStudent/CA1_DEP_TiagoDeOliveiraFreitas_2021406.git  
+**Date**: November 30, 2025
